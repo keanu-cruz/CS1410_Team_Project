@@ -1,0 +1,72 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class Song {
+    - title : String
+    - duration : String
+    + Song(title : String, duration : String)
+    + getTitle() : String
+    + getDuration() : String
+    + toString() : String
+}
+
+class Album {
+    - name : String
+    - songs : List<Song>
+    + Album(name : String)
+    + getName() : String
+    + addSong(song : Song) : boolean
+    + removeSong(song : Song) : void
+    + getSongs() : List<Song>
+    + toString() : String
+}
+Note left of Album : Album.addSong() returns false if a song with\n the same name already exists within a given album.
+
+class Artist {
+    - name : String
+    - albums : List<Album>
+    + Artist(name : String)
+    + getName() : String
+    + addAlbum(album : Album) : boolean
+    + removeAlbum(album : Album) : void
+    + getAlbums() : List<Album>
+    + toString() : String
+}
+Note left of Artist : Artist.addAlbum() returns false if an album with\n the same name already exists for a given artist.
+
+class Library {
+    - artists : List<Artist>
+    + Library()
+    + addArtist(artist : Artist) : boolean
+    + removeArtist(artist : Artist) : void
+    + getArtists() : List<Artist>
+    + searchSongs(query : String) : List<Song>
+}
+Note left of Library : Library.addArtist() returns false if\n an artist with the same name already exists.
+
+class FileHandler {
+    - FILE_NAME : String
+    + save(library : Library) : void
+    + load(library : Library) : void
+}
+
+class MainGUI {
+    - library : Library
+    - selectedArtist : Artist
+    - selectedAlbum : Album
+    - artistList : JList<Artist>
+    - contentList : JList<Object>
+    - searchField : JTextField
+    + MainGUI()
+    + main(args : String[]) : void
+}
+
+Library "1" *-- "0..*" Artist
+Artist "1" *-- "0..*" Album
+Album "1" *-- "0..*" Song
+
+MainGUI --> Library
+MainGUI --> Artist
+MainGUI --> Album
+FileHandler --> Library
+@enduml
