@@ -36,18 +36,17 @@ Note left of Artist : Artist.addAlbum() returns false if an album with\n the sam
 
 class Library {
     - artists : List<Artist>
-    + Library()
     + addArtist(artist : Artist) : boolean
     + removeArtist(artist : Artist) : void
     + getArtists() : List<Artist>
     + searchSongs(query : String) : List<Song>
+    + inputFormatter(input : String) : String
 }
 Note left of Library : Library.addArtist() returns false if\n an artist with the same name already exists.
 
 class FileHandler {
-    - FILE_NAME : String
-    + save(library : Library) : void
-    + load(library : Library) : void
+    + save(library : Library, file : File) : void
+    + load(file : File) : Library
 }
 
 class MainGUI {
