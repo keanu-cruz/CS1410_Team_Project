@@ -1,3 +1,7 @@
 /.idea
 CS1410_Team_Project.iml
 /out
+/bin/
+.classpath
+.project
+.settings/
