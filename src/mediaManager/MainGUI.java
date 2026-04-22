@@ -183,8 +183,15 @@ public class MainGUI extends JFrame {
         System.out.println("[GUI] Add Artist button clicked");
         String name = JOptionPane.showInputDialog(this, "Artist name:",
                 "Add Artist", JOptionPane.PLAIN_MESSAGE);
+        if (name == null || name.isBlank()) {
+            System.out.println("[GUI] Cancelled add operation or empty input");
+            return;
+        }
         Artist artist = new Artist(name.trim());
-        library.addArtist(artist);
+        if (!library.addArtist(artist)) {
+            showDuplicateWarning("An artist with that name already exists.");
+            return;
+        }
         System.out.println("[GUI] Added artist: " + artist.getName());
         autoSave();
         refreshArtistList();
@@ -228,13 +235,20 @@ public class MainGUI extends JFrame {
     private void showAddAlbumDialog(Artist parent) {
         String name = JOptionPane.showInputDialog(this, "Album name:",
                 "Add Album", JOptionPane.PLAIN_MESSAGE);
+        if (name == null || name.isBlank()) {
+            return;
+        }
         Album album = new Album(name.trim());
-        parent.addAlbum(album);
+        if (!parent.addAlbum(album)) {
+            showDuplicateWarning("This artist already has an album with that name.");
+            return;
+        }
         System.out.println("[GUI] Added album '" + album.getName()
                 + "' to artist '" + parent.getName() + "'");
         autoSave();
         refreshContentPane();
     }
+
     private void showAddSongDialog(Album parent) {
         JTextField titleField = new JTextField();
         JTextField durationField = new JTextField();
@@ -245,16 +259,34 @@ public class MainGUI extends JFrame {
         int result = JOptionPane.showConfirmDialog(this, form, "Add Song",
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result != JOptionPane.OK_OPTION) {
+            System.out.println("[GUI] Add song operation cancelled");
             return;
         }
  
         String title = titleField.getText().trim();
         String durationStr = durationField.getText().trim();
+        if (title.isBlank() || durationStr.isBlank()) {
+            JOptionPane.showMessageDialog(this,
+                    "Title and duration are required.",
+                    "Missing field", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
  
-        Double duration = parseDuration(durationStr); 
+        Double duration = parseDuration(durationStr);
+        if (duration == null || duration <= 0) {
+            JOptionPane.showMessageDialog(this,
+                    "Duration must be in M:SS format (such as 3:45) or a positive decimal.",
+                    "Invalid duration", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+ 
         Song song = new Song(title, duration);
-        parent.addSong(song);
-        System.out.println("[GUI] Added song '" + song.getTitle() + "' to album '" + parent.getName() + "'");
+        if (!parent.addSong(song)) {
+            showDuplicateWarning("This album already has a song with that title.");
+            return;
+        }
+        System.out.println("[GUI] Added song '" + song.getTitle()
+                + "' to album '" + parent.getName() + "'");
         autoSave();
         refreshContentPane();
     }
@@ -278,6 +310,11 @@ public class MainGUI extends JFrame {
         } catch (NumberFormatException e) {
             return null;
         }
+    }
+ 
+    private void showDuplicateWarning(String message) {
+        JOptionPane.showMessageDialog(this, message, "Duplicate",
+                JOptionPane.WARNING_MESSAGE);
     }
     
     private void refreshArtistList() {
@@ -346,7 +383,21 @@ public class MainGUI extends JFrame {
             return;
         }
         File file = chooser.getSelectedFile();
-        System.out.println("[GUI] File loaded " + file.getName() + " (not implemented)");
+        try {
+        	library = FileHandler.load(file);
+        	currentFile = file;
+        	selectedArtist = null;
+        	selectedAlbum = null;
+        	searchField.setText("");
+        	refreshArtistList();
+        	refreshContentPane();
+        	System.out.println("[GUI] File loaded " + file.getName());
+        } catch (IOException e) {
+        	System.out.println("[GUI] Could not open file - error: " + e.getMessage());
+        	JOptionPane.showMessageDialog(this, "Failed to open file: " + e.getMessage(),
+                    "Open error", JOptionPane.ERROR_MESSAGE);
+        }
+        
     }
  
     private void onSave() {
@@ -355,7 +406,15 @@ public class MainGUI extends JFrame {
             onSaveAs();
             return;
         }
-        System.out.println("[GUI] Saved file " + currentFile.getName() + " (not implemented)");
+        try {
+            FileHandler.save(library, currentFile);
+            System.out.println("[GUI] Saved file " + currentFile.getName());
+        } catch (IOException e) {
+            System.out.println("[GUI] Could not save file - error: " + e.getMessage());
+            JOptionPane.showMessageDialog(this,
+                    "Failed to save file: " + e.getMessage(),
+                    "Save error", JOptionPane.ERROR_MESSAGE);
+        }
     }
  
     private void onSaveAs() {
@@ -366,7 +425,19 @@ public class MainGUI extends JFrame {
             return;
         }
         File file = chooser.getSelectedFile();
-        System.out.println("[GUI] Saved file " + file.getName() + " (not implemented)");
+        try {
+        	FileHandler.save(library, file);
+            if (!file.getName().endsWith(".txt")) {
+                file = new File(file.getAbsolutePath() + ".txt");
+            }
+            currentFile = file;
+            System.out.println("[GUI] Saved file " + currentFile.getName());
+        } catch (IOException e) {
+            System.out.println("[GUI] Could not save file - error: " + e.getMessage());
+            JOptionPane.showMessageDialog(this,
+                    "Failed to save file: " + e.getMessage(),
+                    "Save error", JOptionPane.ERROR_MESSAGE);
+        }
     }
     
     private void autoSave() {
@@ -374,8 +445,15 @@ public class MainGUI extends JFrame {
             System.out.println("File saved in-memory (no file was set)");
             return;
         }
-        else {
-        	System.out.println("[GUI] auto-saved to " + currentFile.getName() + " (not implemented)");	
+        try {
+        	FileHandler.save(library,  currentFile);
+        	System.out.println("[GUI] auto-saved to " + currentFile.getName());
+        } catch (IOException e) {
+        	System.out.println("[GUI] Auto-save failed: " + e.getMessage());
+        	JOptionPane.showMessageDialog(this,
+                    "Auto-save failed: " + e.getMessage(),
+                    "Save error", JOptionPane.ERROR_MESSAGE);
+
         }
     }
  

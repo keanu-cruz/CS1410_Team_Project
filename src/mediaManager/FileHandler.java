@@ -33,10 +33,10 @@ public class FileHandler {
                 writer.println("ALBUM|" + album.getName());
 
                 for (Song song : album.getSongs()){
-                    writer.println("Song|" + song.getTitle() + "|" + song.getDuration());
+                    writer.println("SONG|" + song.getTitle() + "|" + song.getDuration());
                 }
             }
-        }
+        }	
         writer.close();
     }
 
