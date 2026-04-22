@@ -40,6 +40,12 @@ public class FileHandler {
         writer.close();
     }
 
+    /**
+     * Opens a library from a file using JFileChooser
+     * @param library
+     * @param file
+     * @throws IOException
+     */
     public static Library load(File file) throws IOException{
 
         Library library = new Library();

@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- *
+ * Test Application before incorporating into MainGUI
  * @author Keanu Cruz
  */
 public class TestApp {

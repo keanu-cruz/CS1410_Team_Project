@@ -47,6 +47,7 @@ public class Artist {
     public boolean addAlbum(Album album){
         for (Album a : albums){
             if (a.getName().equalsIgnoreCase(album.getName())){
+            	System.out.println("Album Not Added");
                 return false;
             }
         }

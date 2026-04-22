@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * A library is a collection of artists that holds albums that holds songs.
  * @author Team Assignment: Keanu Cruz + Logan Chess
  */
 public class Library {
@@ -27,6 +27,7 @@ public class Library {
     public boolean addArtist(Artist artist){
         for (Artist a : artists){
             if (a.getName().equalsIgnoreCase(artist.getName())){
+            	System.out.println("Artist Not Added");
                 return false;
             }
         }
