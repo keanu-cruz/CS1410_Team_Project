@@ -56,6 +56,6 @@ public class Song {
         int minutes = (int) duration;
         int seconds = (int) Math.round((duration - minutes) * 100);
 
-        return title + " | " + String.format("%d:%02d", minutes, seconds);
+        return String.format("%-25s %5d:%02d", title, minutes, seconds);
     }
 }
