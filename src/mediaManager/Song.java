@@ -7,6 +7,8 @@ package mediaManager;
 public class Song {
     private String title;
     private double duration;
+    private String artistName;
+    private String albumName;
 
     /**
      * Initializes the fields title and duration for a song.
@@ -39,15 +41,38 @@ public class Song {
     /**
      * Returns duration of a song.
      *
-     * @return
+     * @return duration
      */
     public double getDuration() {
         return duration;
     }
+    
+    /**
+     * Returns song duration minutes counter.
+     * @return minutes
+     */
+    public int getMinutes() {
+        return (int) duration;
+    }
 
     /**
-     * Returns a String in the following format:
-     * {title}|{duration}
+     * Returns song duration seconds counter.
+     * @return seconds
+     */
+    public int getSeconds() {
+        return (int) Math.round((duration - getMinutes()) * 100);
+    }
+    
+    /**
+     * Pulls Artist name and Album name into song for MainGUI Formatting.
+     */
+    public void libraryContext(String artist, String album) {
+    	this.artistName = artist;
+    	this.albumName = album;
+    }
+
+    /**
+     * Returns a String with title truncated if bigger than 28 and duration of song.
      *
      * @return
      */
@@ -56,14 +81,15 @@ public class Song {
         int minutes = (int) duration;
         int seconds = (int) Math.round((duration - minutes) * 100);
         
-        String truncatedTitle;
-        
-       if( title.length() > 20) { // if title is too long it will truncate title with ...
-    	   truncatedTitle = title.substring(0, 22) + "...";
-       } else {
-    	   truncatedTitle = title;
-       }
+        int TITLE_WIDTH = 28; // Max Title Width allowed
 
-        return String.format("%-25s %5d:%02d", truncatedTitle, minutes, seconds);
+        String displayTitle = title;
+
+        if (displayTitle.length() > TITLE_WIDTH) {
+            displayTitle = displayTitle.substring(0, TITLE_WIDTH - 3) + "...";
+        }
+
+        return String.format("%-" + TITLE_WIDTH + "s %5d:%02d",
+                displayTitle, minutes, seconds);
     }
 }

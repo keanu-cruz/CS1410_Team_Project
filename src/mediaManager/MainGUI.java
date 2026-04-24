@@ -7,6 +7,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.io.File;
 import java.io.IOException;
@@ -60,13 +61,17 @@ public class MainGUI extends JFrame {
     private boolean searchActive = false;	// whether or not search bar is being used.
 	private JButton removeContentButton;
 	private boolean internalChange = false; // Guard for onSearchChanged
-	private boolean autoSaveEnabled = false; // Auto save off by default
+	private boolean autoSaveEnabled = true; // Auto save on by default
 	private JCheckBoxMenuItem autoSaveOnOff; // File Menu Checkbox
 	private JLabel songTitleHeader;
 	private JLabel songDurationHeader;
+	private JPanel songHeaderContainer;
+	private JLabel artistHeader;
+	private JLabel albumHeader;
     
     public MainGUI() {
         super("Media Collection Manager");
+        setResizable(false);
         
         // Dialog Box Format
         dialogBoxFormatting();
@@ -104,7 +109,7 @@ public class MainGUI extends JFrame {
         UIManager.put("OptionPane.messageForeground", Color.WHITE);
 
         UIManager.put("Button.background", new Color(20, 63, 89));
-        UIManager.put("Button.foreground", new Color(52, 138, 191));
+        UIManager.put("Button.foreground", Color.WHITE);
 
         UIManager.put("TextField.background", new Color(23, 25, 32));
         UIManager.put("TextField.foreground", Color.WHITE);
@@ -133,9 +138,9 @@ public class MainGUI extends JFrame {
 		panel.setBorder(new EmptyBorder(15, 0, 15, 0));
 		
         JButton saveButton = new JButton("Save");
-        saveButton.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        saveButton.setFont(new Font("Segoe UI", Font.BOLD, 12));
         saveButton.setBorderPainted(false);
-        saveButton.setForeground(new Color(52, 138, 191));
+        saveButton.setForeground(new Color(255, 255, 255));
         saveButton.setBackground(new Color(20, 63, 89));
         saveButton.setFocusPainted(false);
         saveButton.setMargin(new Insets(10, 50, 10, 50));
@@ -144,9 +149,9 @@ public class MainGUI extends JFrame {
         panel.add(saveButton);
         
         JButton loadButton = new JButton("Load");
-        loadButton.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        loadButton.setFont(new Font("Segoe UI", Font.BOLD, 12));
         loadButton.setBorderPainted(false);
-        loadButton.setForeground(new Color(52, 138, 191));
+        loadButton.setForeground(new Color(255, 255, 255));
         loadButton.setBackground(new Color(20, 63, 89));
         loadButton.setFocusPainted(false);
         loadButton.setMargin(new Insets(10, 50, 10, 50));
@@ -164,7 +169,7 @@ public class MainGUI extends JFrame {
         JMenuBar bar = new JMenuBar();
         bar.setForeground(new Color(255, 255, 255));
         bar.setBackground(new Color(20, 63, 89));
-        bar.setBorder(new EmptyBorder(3, 3, 3, 3));
+        bar.setBorder(new EmptyBorder(5, 3, 5, 3));
         JMenu fileMenu = new JMenu("File");
         fileMenu.setBackground(new Color(107, 123, 156));
         fileMenu.setForeground(new Color(255, 255, 255));
@@ -187,10 +192,10 @@ public class MainGUI extends JFrame {
         saveAsItem.addActionListener(e -> onSaveAs());
         fileMenu.add(saveAsItem);
         
-        autoSaveOnOff = new JCheckBoxMenuItem("AutoSave: OFF");
+        autoSaveOnOff = new JCheckBoxMenuItem("AutoSave: ON");
         autoSaveOnOff.setBackground(new Color(23, 25, 32));
         autoSaveOnOff.setForeground(new Color(255, 255, 255));
-        autoSaveOnOff.setSelected(false);
+        autoSaveOnOff.setSelected(true);
         autoSaveOnOff.addActionListener(e -> {
         	autoSaveEnabled = autoSaveOnOff.isSelected();
         	System.out.println("[DEBUG] toggled = " + autoSaveEnabled);
@@ -216,15 +221,16 @@ public class MainGUI extends JFrame {
     private JPanel buildSearchBar() {
         JPanel panel = new JPanel(new BorderLayout(4, 4));
         panel.setBackground(new Color(23, 25, 32));
-        panel.setBorder(new EmptyBorder(6, 6, 6, 6));
+        panel.setBorder(new EmptyBorder(10, 6, 6, 6));
         JLabel label = new JLabel("Search: ");
+        label.setBorder(new EmptyBorder(0, 5, 0, 0));
         label.setFont(new Font("Segoe UI", Font.BOLD, 11));
         label.setForeground(new Color(255, 255, 255));
         panel.add(label, BorderLayout.WEST);
  
         searchField = new JTextField();
         searchField.setForeground(new Color(255, 255, 255));
-        searchField.setBorder(new LineBorder(new Color(192, 192, 192), 1, true));
+        searchField.setBorder(new CompoundBorder(new LineBorder(new Color(192, 192, 192), 1, true), new EmptyBorder(0, 5, 0, 0)));
         searchField.setBackground(new Color(23, 25, 32));
         searchField.getDocument().addDocumentListener(new DocumentListener() {
             @Override public void insertUpdate(DocumentEvent e)  { onSearchChanged(); }
@@ -302,7 +308,7 @@ public class MainGUI extends JFrame {
         // Remove Artist Button
         
         JButton removeArtistButton = new JButton("Remove Artist");
-        removeArtistButton.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        removeArtistButton.setFont(new Font("Segoe UI", Font.BOLD, 11));
         removeArtistButton.setBorderPainted(false);
         removeArtistButton.setBackground(new Color(89, 45, 45));
         removeArtistButton.setForeground(new Color(242, 114, 114));
@@ -319,7 +325,11 @@ public class MainGUI extends JFrame {
     private JPanel buildContentPanel() {
         JPanel panel = new JPanel(new BorderLayout(4, 4));
         panel.setBackground(new Color(23, 25, 32));
-        panel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 0, 10), new CompoundBorder(new LineBorder(new Color(192, 192, 192), 1, true), new EmptyBorder(5, 5, 5, 5))));
+        panel.setBorder(new CompoundBorder(
+        		new EmptyBorder(0, 0, 0, 10), 
+        		new CompoundBorder(
+        				new LineBorder(new Color(192, 192, 192), 1, true), 
+        				new EmptyBorder(5, 5, 5, 5))));
  
         JPanel header = new JPanel(new BorderLayout());
         header.setBackground(new Color(20, 63, 89));
@@ -371,25 +381,32 @@ public class MainGUI extends JFrame {
         contentList.addListSelectionListener(this::onContentSelectionChanged);
         panel.add(contentScroll, BorderLayout.CENTER);
         
-        JPanel panel_1 = new JPanel();
-        contentScroll.setColumnHeaderView(panel_1);
-        panel_1.setLayout(new BorderLayout(0, 0));
+        songHeaderContainer = new JPanel();
+        contentScroll.setColumnHeaderView(songHeaderContainer);
+        songHeaderContainer.setLayout(new GridLayout(0, 4, 0, 0));
+        songHeaderContainer.setBorder(new EmptyBorder(10, 10, 0, 0));
+        
+        artistHeader = new JLabel("Artist");
+        artistHeader.setFont(new Font("Lucida Sans", Font.BOLD, 12));
+        songHeaderContainer.add(artistHeader);
+        
+        albumHeader = new JLabel("Album");
+        albumHeader.setFont(new Font("Lucida Sans", Font.BOLD, 12));
+        songHeaderContainer.add(albumHeader);
         
         songTitleHeader = new JLabel("Title");
-        songTitleHeader.setBorder(new EmptyBorder(0, 10, 0, 0));
-        songTitleHeader.setFont(new Font("Lucida Sans Typewriter", Font.BOLD, 12));
-        panel_1.add(songTitleHeader);
+        songTitleHeader.setFont(new Font("Lucida Sans", Font.BOLD, 12));
+        songHeaderContainer.add(songTitleHeader);
         
         songDurationHeader = new JLabel("Duration");
-        songDurationHeader.setFont(new Font("Lucida Sans Typewriter", Font.BOLD, 12));
-        songDurationHeader.setBorder(new EmptyBorder(0, 0, 0, 230));
+        songDurationHeader.setFont(new Font("Lucida Sans", Font.BOLD, 12));
         songDurationHeader.setHorizontalAlignment(SwingConstants.LEFT);
-        panel_1.add(songDurationHeader, BorderLayout.EAST);
+        songHeaderContainer.add(songDurationHeader);
         
         // Button to Remove an Item from Content Pane
         
         removeContentButton = new JButton("Remove Song");
-        removeContentButton.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        removeContentButton.setFont(new Font("Segoe UI", Font.BOLD, 11));
         removeContentButton.setBorderPainted(false);
         removeContentButton.setBackground(new Color(89, 45, 45));
         removeContentButton.setForeground(new Color(242, 114, 114));
@@ -738,11 +755,15 @@ public class MainGUI extends JFrame {
     }
     
     /**
-     * Refreshes Artist Pane
+     * Refreshes Artist Pane Alphabetically 
      */
     private void refreshArtistList() {
         artistModel.clear();
-        for (Artist a : library.getArtists()) {
+
+        List<Artist> artists = new ArrayList<>(library.getArtists());
+        artists.sort(Comparator.comparing(a -> a.getName().toLowerCase()));
+
+        for (Artist a : artists) {
             artistModel.addElement(a);
         }
     }
@@ -752,18 +773,39 @@ public class MainGUI extends JFrame {
      */
     private void refreshContentPane() {
     	
-    	boolean showSongHeaders = (selectedAlbum != null) || searchActive || 
-    			(selectedArtist == null && selectedAlbum == null);
+    	boolean isLibraryView = selectedArtist == null && selectedAlbum == null && !searchActive;
+    	boolean isAlbumView = selectedAlbum != null;
 
-    	songTitleHeader.setVisible(showSongHeaders);
-    	songDurationHeader.setVisible(showSongHeaders);
+    	if (isLibraryView) {
+    	    songHeaderContainer.removeAll();
+    	    songHeaderContainer.setLayout(new GridLayout(1, 4));
+
+    	    songHeaderContainer.add(artistHeader);
+    	    songHeaderContainer.add(albumHeader);
+    	    songHeaderContainer.add(songTitleHeader);
+    	    songHeaderContainer.add(songDurationHeader);
+    	}
+    	
+    	else if (isAlbumView || searchActive) {
+    	    songHeaderContainer.removeAll();
+    	    songHeaderContainer.setLayout(new GridLayout(1, 2));
+
+    	    songHeaderContainer.add(songTitleHeader);
+    	    songHeaderContainer.add(songDurationHeader);
+    	} else {
+    	    songHeaderContainer.removeAll();
+    	    songHeaderContainer.add(albumHeader);
+    	}
+    	
+    	songHeaderContainer.revalidate();
+    	songHeaderContainer.repaint();
         
     	contentModel.clear();
  
         if (searchActive) {
             contentHeader.setText("Search Results");
-            for (Song s : library.searchSongs(searchField.getText())) {
-                contentModel.addElement(s);
+            for (Object o : library.search(searchField.getText())) {
+                contentModel.addElement(o);
             }
             addContentButton.setEnabled(false);
             addContentButton.setToolTipText(null);
@@ -773,25 +815,50 @@ public class MainGUI extends JFrame {
         }
  
         if (selectedAlbum != null) {
-            contentHeader.setText(selectedAlbum.getName() + " - Songs");
-            for (Song s : selectedAlbum.getSongs()) {
+            contentHeader.setText(selectedArtist.getName() + " > " + selectedAlbum.getName() + " > Songs");
+
+            // Sort songs alphabetically before adding to contentModel
+            List<Song> songs = new ArrayList<>(selectedAlbum.getSongs());
+            songs.sort(Comparator.comparing(s -> s.getTitle().toLowerCase()));
+
+            for (Song s : songs) {
                 contentModel.addElement(s);
             }
+            
             addContentButton.setEnabled(true);
             addContentButton.setToolTipText("Add song to this album");
             backButton.setEnabled(true);
         } else if (selectedArtist != null) {
-            contentHeader.setText(selectedArtist.getName() + " - Albums");
-            for (Album a : selectedArtist.getAlbums()) {
+            contentHeader.setText(selectedArtist.getName() + " > Albums");
+
+            // Sorts Albums alphabetically before adding to contentModel
+            List<Album> albums = new ArrayList<>(selectedArtist.getAlbums());
+            albums.sort(Comparator.comparing(a -> a.getName().toLowerCase()));
+
+            for (Album a : albums) {
                 contentModel.addElement(a);
             }
+            
             addContentButton.setEnabled(true);
             addContentButton.setToolTipText("Add album to this artist");
             backButton.setEnabled(true);
         } else {
             contentHeader.setText("Library");
-            for (Song s : getAllSongs()) {
-                contentModel.addElement(s);
+            for (Artist artist : library.getArtists()) {
+                for (Album album : artist.getAlbums()) {
+                    for (Song song : album.getSongs()) {
+
+                    	String text = String.format(
+                    		    "%-15s %-15s %-15s %-8s",
+                    		    truncate(artist.getName(), 13),
+                    		    truncate(album.getName(), 13),
+                    		    truncate(song.getTitle(), 15),
+                    		    song.getMinutes() + ":" + String.format("%02d", song.getSeconds())
+                    		);
+
+                        contentModel.addElement(text);
+                    }
+                }
             }
             addContentButton.setEnabled(false);
             addContentButton.setToolTipText(null);
@@ -811,6 +878,10 @@ public class MainGUI extends JFrame {
         }
     }
     
+    private String truncate(String text, int max) {
+        if (text.length() <= max) return text;
+        return text.substring(0, max - 3) + "...";
+    }
     
     
     /**
