@@ -60,11 +60,17 @@ public class MainGUI extends JFrame {
     private boolean searchActive = false;	// whether or not search bar is being used.
 	private JButton removeContentButton;
 	private boolean internalChange = false; // Guard for onSearchChanged
-	private boolean autoSaveEnabled = false;
-	private JCheckBoxMenuItem autoSaveOnOff;
+	private boolean autoSaveEnabled = false; // Auto save off by default
+	private JCheckBoxMenuItem autoSaveOnOff; // File Menu Checkbox
+	private JLabel songTitleHeader;
+	private JLabel songDurationHeader;
     
     public MainGUI() {
         super("Media Collection Manager");
+        
+        // Dialog Box Format
+        dialogBoxFormatting();
+        
         getContentPane().setBackground(new Color(23, 25, 32));
         setBackground(new Color(84, 98, 126));
         this.library = new Library();
@@ -78,15 +84,49 @@ public class MainGUI extends JFrame {
         getContentPane().add(buildSearchBar(), BorderLayout.NORTH);
         getContentPane().add(buildArtistPanel(), BorderLayout.WEST);
         getContentPane().add(buildContentPanel(), BorderLayout.CENTER);
-        
-        
         getContentPane().add(buildSaveLoadPanel(), BorderLayout.SOUTH);
+        
         buildSaveLoadPanel();
  
         refreshArtistList();
         refreshContentPane();
     }
 
+    /**
+     * Custom Dialog and Directory Background and Padding.
+     */
+	private void dialogBoxFormatting() {
+		UIManager.put("OptionPane.background", new Color(23, 25, 32));
+        UIManager.put("Panel.background", new Color(23, 25, 32));
+        UIManager.put("FileChooser.foreground", Color.WHITE);
+        UIManager.put("Label.foreground", Color.WHITE);
+
+        UIManager.put("OptionPane.messageForeground", Color.WHITE);
+
+        UIManager.put("Button.background", new Color(20, 63, 89));
+        UIManager.put("Button.foreground", new Color(52, 138, 191));
+
+        UIManager.put("TextField.background", new Color(23, 25, 32));
+        UIManager.put("TextField.foreground", Color.WHITE);
+        UIManager.put("TextField.caretForeground", Color.WHITE);
+
+        UIManager.put("OptionPane.border",
+            BorderFactory.createLineBorder(new Color(192,192,192)));
+        
+        UIManager.put("OptionPane.messageAreaBorder",
+        	    BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        UIManager.put("OptionPane.buttonAreaBorder",
+        	    BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        UIManager.put("OptionPane.border",
+        	    BorderFactory.createEmptyBorder(10, 10, 10, 10));
+	}
+
+	/**
+	 * Panel in South that holds Save and Load Buttons
+	 * @return Save Load Panel
+	 */
 	private JPanel buildSaveLoadPanel() {
 		JPanel panel = new JPanel();
 		panel.setBackground(new Color(23, 25, 32));
@@ -116,6 +156,10 @@ public class MainGUI extends JFrame {
         return panel;
 	}
     
+	/**
+	 * Menu Bar with File Menu
+	 * @return
+	 */
     private JMenuBar buildMenuBar() {
         JMenuBar bar = new JMenuBar();
         bar.setForeground(new Color(255, 255, 255));
@@ -158,10 +202,17 @@ public class MainGUI extends JFrame {
         return bar;
     }
     
+    /**
+     * Used to toggle AutoSave on or off in File Menu
+     */
     private void updateAutoSaveMenuText() {
     	autoSaveOnOff.setText(autoSaveEnabled ? "Auto Save: ON" : "Auto Save: OFF");
     }
  
+    /**
+     * Search Bar with Clear Button
+     * @return Search Bar with Clear Button
+     */
     private JPanel buildSearchBar() {
         JPanel panel = new JPanel(new BorderLayout(4, 4));
         panel.setBackground(new Color(23, 25, 32));
@@ -182,6 +233,7 @@ public class MainGUI extends JFrame {
         });
         panel.add(searchField, BorderLayout.CENTER);
         
+        // Clear Button for Search Bar
         JButton clearTextButton = new JButton("");
         clearTextButton.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
@@ -200,6 +252,10 @@ public class MainGUI extends JFrame {
         return panel;
     }
     
+    /**
+     * Artist Portion of GUI
+     * @return
+     */
     private JPanel buildArtistPanel() {
         JPanel panel = new JPanel(new BorderLayout(4, 4));
         panel.setBackground(new Color(23, 25, 32));
@@ -243,6 +299,8 @@ public class MainGUI extends JFrame {
         artistList.addListSelectionListener(this::onArtistSelectionChanged);
         panel.add(artistScroll, BorderLayout.CENTER);
         
+        // Remove Artist Button
+        
         JButton removeArtistButton = new JButton("Remove Artist");
         removeArtistButton.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         removeArtistButton.setBorderPainted(false);
@@ -254,6 +312,10 @@ public class MainGUI extends JFrame {
         return panel;
     }
  
+    /**
+     * Album and Song Portion of GUI
+     * @return
+     */
     private JPanel buildContentPanel() {
         JPanel panel = new JPanel(new BorderLayout(4, 4));
         panel.setBackground(new Color(23, 25, 32));
@@ -309,6 +371,23 @@ public class MainGUI extends JFrame {
         contentList.addListSelectionListener(this::onContentSelectionChanged);
         panel.add(contentScroll, BorderLayout.CENTER);
         
+        JPanel panel_1 = new JPanel();
+        contentScroll.setColumnHeaderView(panel_1);
+        panel_1.setLayout(new BorderLayout(0, 0));
+        
+        songTitleHeader = new JLabel("Title");
+        songTitleHeader.setBorder(new EmptyBorder(0, 10, 0, 0));
+        songTitleHeader.setFont(new Font("Lucida Sans Typewriter", Font.BOLD, 12));
+        panel_1.add(songTitleHeader);
+        
+        songDurationHeader = new JLabel("Duration");
+        songDurationHeader.setFont(new Font("Lucida Sans Typewriter", Font.BOLD, 12));
+        songDurationHeader.setBorder(new EmptyBorder(0, 0, 0, 230));
+        songDurationHeader.setHorizontalAlignment(SwingConstants.LEFT);
+        panel_1.add(songDurationHeader, BorderLayout.EAST);
+        
+        // Button to Remove an Item from Content Pane
+        
         removeContentButton = new JButton("Remove Song");
         removeContentButton.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         removeContentButton.setBorderPainted(false);
@@ -326,16 +405,23 @@ public class MainGUI extends JFrame {
         return panel;
     }
     
+    /**
+     * Removes Songs from overall Library
+     * @param song
+     */
     private void removeSongFromLibrary(Song song) {
         for (Artist artist : library.getArtists()) {
             for (Album album : artist.getAlbums()) {
                 if (album.getSongs().remove(song)) {
-                    return; // stop once removed
+                    return;
                 }
             }
         }
     }
     
+    /**
+     * Removes an artist from a Library including Albums and Songs
+     */
     private void onRemoveArtist() {
         Artist selected = artistList.getSelectedValue();
         if (selected == null) return;
@@ -358,6 +444,9 @@ public class MainGUI extends JFrame {
         refreshContentPane();
     }
     
+    /**
+     * Remove an Album from an Artist including it's songs
+     */
     private void onRemoveAlbum() {
         if (selectedArtist == null || selectedAlbum == null) return;
 
@@ -377,6 +466,9 @@ public class MainGUI extends JFrame {
         refreshContentPane();
     }
     
+    /**
+     * Removes a song from an Album
+     */
     private void onRemoveSong() {
         Object selected = contentList.getSelectedValue();
         if (!(selected instanceof Song song)) return;
@@ -399,6 +491,10 @@ public class MainGUI extends JFrame {
         refreshContentPane();
     }
     
+    /**
+     * Selects Artists and Resets Fields
+     * @param e
+     */
     private void onArtistSelectionChanged(ListSelectionEvent e) {
         if (e.getValueIsAdjusting()) return;
 
@@ -415,6 +511,10 @@ public class MainGUI extends JFrame {
         refreshContentPane();
     }
     
+    /**
+     * Selects Album and Songs, Changes Remove Button between Album and Songs
+     * @param e
+     */
     private void onContentSelectionChanged(ListSelectionEvent e) {
         if (e.getValueIsAdjusting()) return;
 
@@ -446,6 +546,9 @@ public class MainGUI extends JFrame {
         }
     }
  
+    /**
+     * Adds Artist using dialog box
+     */
     private void onAddArtist() {
         System.out.println("[GUI] Add Artist button clicked");
         String name = JOptionPane.showInputDialog(this, "Artist name:",
@@ -470,6 +573,9 @@ public class MainGUI extends JFrame {
         refreshArtistList();
     }
     
+    /**
+     * Add Album and Song using dialog box
+     */
     private void onAddContent() {
         if (selectedAlbum != null) {
             System.out.println("[GUI] Add button clicked, context=song, album=" + selectedAlbum.getName());
@@ -480,6 +586,9 @@ public class MainGUI extends JFrame {
         }
     }
     
+    /**
+     * Returns form songs to Albums content view.
+     */
     private void onBack() {
     	
     	if (searchActive) {
@@ -501,6 +610,9 @@ public class MainGUI extends JFrame {
         refreshContentPane();
     }
  
+    /**
+     * Updates Search query in ContentPane
+     */
     private void onSearchChanged() {
     	if (internalChange) return;
     	
@@ -519,6 +631,10 @@ public class MainGUI extends JFrame {
         refreshContentPane();
     }
     
+    /**
+     * Helper Method: Dialog Box for Add Album
+     * @param parent
+     */
     private void showAddAlbumDialog(Artist parent) {
         String name = JOptionPane.showInputDialog(this, "Album name:",
                 "Add Album", JOptionPane.PLAIN_MESSAGE);
@@ -545,6 +661,10 @@ public class MainGUI extends JFrame {
         refreshContentPane();
     }
 
+    /**
+     * Helper Method: Dialog Box for Add Album
+     * @param parent
+     */
     private void showAddSongDialog(Album parent) {
         JTextField titleField = new JTextField();
         JTextField durationField = new JTextField();
@@ -608,11 +728,18 @@ public class MainGUI extends JFrame {
         }
     }
  
+    /**
+     * If an item that is trying to be added is a duplicate warning dialog shows.
+     * @param message
+     */
     private void showDuplicateWarning(String message) {
         JOptionPane.showMessageDialog(this, message, "Duplicate",
                 JOptionPane.WARNING_MESSAGE);
     }
     
+    /**
+     * Refreshes Artist Pane
+     */
     private void refreshArtistList() {
         artistModel.clear();
         for (Artist a : library.getArtists()) {
@@ -620,7 +747,16 @@ public class MainGUI extends JFrame {
         }
     }
     
+    /**
+     * Refreshes Content Pane
+     */
     private void refreshContentPane() {
+    	
+    	boolean showSongHeaders = (selectedAlbum != null) || searchActive || 
+    			(selectedArtist == null && selectedAlbum == null);
+
+    	songTitleHeader.setVisible(showSongHeaders);
+    	songDurationHeader.setVisible(showSongHeaders);
         
     	contentModel.clear();
  
@@ -675,6 +811,12 @@ public class MainGUI extends JFrame {
         }
     }
     
+    
+    
+    /**
+     * Displays all song in Library View.
+     * @return
+     */
     private List<Song> getAllSongs() {
         List<Song> all = new ArrayList<>();
         for (Artist a : library.getArtists()) {
@@ -685,6 +827,9 @@ public class MainGUI extends JFrame {
         return all;
     }
     
+    /**
+     * Handles FileChooser for Open option in File Menu and Load Button
+     */
     private void onOpen() {
         System.out.println("[GUI] File > Open clicked");
         JFileChooser chooser = new JFileChooser();
@@ -710,6 +855,9 @@ public class MainGUI extends JFrame {
         
     }
  
+    /**
+     * Saves a file to existing file from File Menu
+     */
     private void onSave() {
         System.out.println("[GUI] File > Save clicked");
         if (currentFile == null) {
@@ -727,6 +875,9 @@ public class MainGUI extends JFrame {
         }
     }
  
+    /**
+     * Saves a file with the option for user to choose file name.
+     */
     private void onSaveAs() {
         System.out.println("[GUI] File > Save As clicked");
         JFileChooser chooser = new JFileChooser();
@@ -750,6 +901,9 @@ public class MainGUI extends JFrame {
         }
     }
     
+    /**
+     * Auto Save is a function that will for a save with any new addition to Media Collection Manager.
+     */
     private void autoSave() {
     	
         System.out.println("[DEBUG] autoSave() called");

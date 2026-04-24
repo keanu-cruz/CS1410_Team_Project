@@ -55,7 +55,15 @@ public class Song {
     public String toString() {
         int minutes = (int) duration;
         int seconds = (int) Math.round((duration - minutes) * 100);
+        
+        String truncatedTitle;
+        
+       if( title.length() > 20) { // if title is too long it will truncate title with ...
+    	   truncatedTitle = title.substring(0, 22) + "...";
+       } else {
+    	   truncatedTitle = title;
+       }
 
-        return String.format("%-25s %5d:%02d", title, minutes, seconds);
+        return String.format("%-25s %5d:%02d", truncatedTitle, minutes, seconds);
     }
 }
