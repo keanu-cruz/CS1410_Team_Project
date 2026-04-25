@@ -242,10 +242,12 @@ public class MainGUI extends JFrame {
         
         // Clear Button for Search Bar
         JButton clearTextButton = new JButton("");
-        clearTextButton.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        		searchField.setText("");
-        	}
+        clearTextButton.addActionListener(e -> {
+            internalChange = true;
+            searchField.setText("");
+            internalChange = false;
+            searchActive = false;
+            refreshContentPane();
         });
         clearTextButton.setFocusPainted(false);
         clearTextButton.setContentAreaFilled(false);
@@ -554,6 +556,13 @@ public class MainGUI extends JFrame {
         Object selected = contentList.getSelectedValue();
 
         if (selected instanceof Album album) {
+        	if (searchActive) {
+        		selectedArtist = findArtistFor(album);
+        		internalChange = true;
+        		searchField.setText("");
+        		internalChange = false;
+        		searchActive = false;
+        	}
             selectedAlbum = album;
             selectedSong = null;
             refreshContentPane();
@@ -577,6 +586,13 @@ public class MainGUI extends JFrame {
         } else {
             removeContentButton.setText("Remove Song");
         }
+    }
+    
+    private Artist findArtistFor(Album album) {
+        for (Artist a : library.getArtists()) {
+            if (a.getAlbums().contains(album)) return a;
+        }
+        return null;
     }
  
     /**
