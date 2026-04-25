@@ -596,6 +596,12 @@ public class MainGUI extends JFrame {
                     "Missing field", JOptionPane.WARNING_MESSAGE);
             return;
         }
+        if (name.contains("|")) {
+            JOptionPane.showMessageDialog(this,
+                "Names cannot contain the '|' character.",
+                "Invalid name", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
         Artist artist = new Artist(name.trim());
         if (!library.addArtist(artist)) {
             showDuplicateWarning("An artist with that name already exists.");
@@ -682,6 +688,12 @@ public class MainGUI extends JFrame {
                     "Missing field", JOptionPane.WARNING_MESSAGE);
             return;
         }
+        if (name.contains("|")) {
+            JOptionPane.showMessageDialog(this,
+                "Names cannot contain the '|' character.",
+                "Invalid name", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
         Album album = new Album(name.trim());
         if (!parent.addAlbum(album)) {
             showDuplicateWarning("This artist already has an album with that name.");
@@ -711,6 +723,7 @@ public class MainGUI extends JFrame {
             System.out.println("[GUI] Add song operation cancelled");
             return;
         }
+        
  
         String title = titleField.getText().trim();
         String durationStr = durationField.getText().trim();
@@ -718,6 +731,12 @@ public class MainGUI extends JFrame {
             JOptionPane.showMessageDialog(this,
                     "Title and duration are required.",
                     "Missing field", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        if (title.contains("|")) {
+            JOptionPane.showMessageDialog(this,
+                "Title cannot contain the '|' character.",
+                "Invalid title", JOptionPane.WARNING_MESSAGE);
             return;
         }
  
