@@ -42,7 +42,6 @@ public class FileHandler {
 
     /**
      * Opens a library from a file using JFileChooser
-     * @param library
      * @param file
      * @throws IOException
      */
