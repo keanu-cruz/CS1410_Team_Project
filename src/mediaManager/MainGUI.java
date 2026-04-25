@@ -16,6 +16,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.border.LineBorder;
 import javax.swing.border.CompoundBorder;
+import java.net.URL;
 
 /**
  * Main window for the media collection manager.
@@ -249,10 +250,25 @@ public class MainGUI extends JFrame {
         clearTextButton.setFocusPainted(false);
         clearTextButton.setContentAreaFilled(false);
         clearTextButton.setBorder(new EmptyBorder(6, 2, 6, 8));
-        ImageIcon originalIcon = new ImageIcon(MainGUI.class.getResource("/mediaManager/Resources/png-clipart-computer-icons-backspace-arrow-symbol-cross-arrow-angle-text.png"));
-        Image image = originalIcon.getImage();
-        Image newImage = image.getScaledInstance(18, 13, java.awt.Image.SCALE_SMOOTH);
-        ImageIcon scaledIcon = new ImageIcon(newImage);
+        // shortened file to prevent any possible typo and make the purpose clearer.
+        URL iconURL = MainGUI.class.getResource("/mediaManager/Resources/clear-icon.png");
+        ImageIcon scaledIcon = null;
+        if (iconURL != null) { 
+        	Image image = new ImageIcon(iconURL).getImage();
+        	Image newImage = image.getScaledInstance(18, 13, java.awt.Image.SCALE_SMOOTH);
+            scaledIcon = new ImageIcon(newImage);
+        }
+        if (scaledIcon != null) {
+        	clearTextButton.setIcon(scaledIcon);
+        } else {
+        	// In case the image is not able to be loaded,
+        	// we'd rather the program show an "X" compared to crashing
+        	// which is what happened to me in Eclipse.
+        	clearTextButton.setText("X");
+        }
+        
+        
+        
         clearTextButton.setIcon(scaledIcon);
         panel.add(clearTextButton, BorderLayout.EAST);
         return panel;
