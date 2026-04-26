@@ -16,6 +16,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.border.LineBorder;
 import javax.swing.border.CompoundBorder;
+import java.net.URL;
 
 /**
  * Main window for the media collection manager.
@@ -241,18 +242,35 @@ public class MainGUI extends JFrame {
         
         // Clear Button for Search Bar
         JButton clearTextButton = new JButton("");
-        clearTextButton.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        		searchField.setText("");
-        	}
+        clearTextButton.addActionListener(e -> {
+            internalChange = true;
+            searchField.setText("");
+            internalChange = false;
+            searchActive = false;
+            refreshContentPane();
         });
         clearTextButton.setFocusPainted(false);
         clearTextButton.setContentAreaFilled(false);
         clearTextButton.setBorder(new EmptyBorder(6, 2, 6, 8));
-        ImageIcon originalIcon = new ImageIcon(MainGUI.class.getResource("/mediaManager/Resources/png-clipart-computer-icons-backspace-arrow-symbol-cross-arrow-angle-text.png"));
-        Image image = originalIcon.getImage();
-        Image newImage = image.getScaledInstance(18, 13, java.awt.Image.SCALE_SMOOTH);
-        ImageIcon scaledIcon = new ImageIcon(newImage);
+        // shortened file to prevent any possible typo and make the purpose clearer.
+        URL iconURL = MainGUI.class.getResource("/mediaManager/Resources/clear-icon.png");
+        ImageIcon scaledIcon = null;
+        if (iconURL != null) { 
+        	Image image = new ImageIcon(iconURL).getImage();
+        	Image newImage = image.getScaledInstance(18, 13, java.awt.Image.SCALE_SMOOTH);
+            scaledIcon = new ImageIcon(newImage);
+        }
+        if (scaledIcon != null) {
+        	clearTextButton.setIcon(scaledIcon);
+        } else {
+        	// In case the image is not able to be loaded,
+        	// we'd rather the program show an "X" compared to crashing
+        	// which is what happened to me in Eclipse.
+        	clearTextButton.setText("X");
+        }
+        
+        
+        
         clearTextButton.setIcon(scaledIcon);
         panel.add(clearTextButton, BorderLayout.EAST);
         return panel;
@@ -538,6 +556,13 @@ public class MainGUI extends JFrame {
         Object selected = contentList.getSelectedValue();
 
         if (selected instanceof Album album) {
+        	if (searchActive) {
+        		selectedArtist = findArtistFor(album);
+        		internalChange = true;
+        		searchField.setText("");
+        		internalChange = false;
+        		searchActive = false;
+        	}
             selectedAlbum = album;
             selectedSong = null;
             refreshContentPane();
@@ -562,6 +587,13 @@ public class MainGUI extends JFrame {
             removeContentButton.setText("Remove Song");
         }
     }
+    
+    private Artist findArtistFor(Album album) {
+        for (Artist a : library.getArtists()) {
+            if (a.getAlbums().contains(album)) return a;
+        }
+        return null;
+    }
  
     /**
      * Adds Artist using dialog box
@@ -578,6 +610,12 @@ public class MainGUI extends JFrame {
         	JOptionPane.showMessageDialog(this,
                     "Artist name is required.",
                     "Missing field", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        if (name.contains("|")) {
+            JOptionPane.showMessageDialog(this,
+                "Names cannot contain the '|' character.",
+                "Invalid name", JOptionPane.WARNING_MESSAGE);
             return;
         }
         Artist artist = new Artist(name.trim());
@@ -666,6 +704,12 @@ public class MainGUI extends JFrame {
                     "Missing field", JOptionPane.WARNING_MESSAGE);
             return;
         }
+        if (name.contains("|")) {
+            JOptionPane.showMessageDialog(this,
+                "Names cannot contain the '|' character.",
+                "Invalid name", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
         Album album = new Album(name.trim());
         if (!parent.addAlbum(album)) {
             showDuplicateWarning("This artist already has an album with that name.");
@@ -695,6 +739,7 @@ public class MainGUI extends JFrame {
             System.out.println("[GUI] Add song operation cancelled");
             return;
         }
+        
  
         String title = titleField.getText().trim();
         String durationStr = durationField.getText().trim();
@@ -702,6 +747,12 @@ public class MainGUI extends JFrame {
             JOptionPane.showMessageDialog(this,
                     "Title and duration are required.",
                     "Missing field", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        if (title.contains("|")) {
+            JOptionPane.showMessageDialog(this,
+                "Title cannot contain the '|' character.",
+                "Invalid title", JOptionPane.WARNING_MESSAGE);
             return;
         }
  

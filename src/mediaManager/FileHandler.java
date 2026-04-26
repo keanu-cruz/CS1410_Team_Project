@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 /**
@@ -24,25 +25,23 @@ public class FileHandler {
             file = new File(file.getAbsolutePath() + ".txt");
         }
 
-        PrintWriter writer = new PrintWriter(new FileWriter(file));
+        try (PrintWriter writer = new PrintWriter(new FileWriter(file, StandardCharsets.UTF_8))) {
+            for (Artist artist : library.getArtists()){
+                writer.println("ARTIST|" + artist.getName());
 
-        for (Artist artist : library.getArtists()){
-            writer.println("ARTIST|" + artist.getName());
+                for (Album album : artist.getAlbums()){
+                    writer.println("ALBUM|" + album.getName());
 
-            for (Album album : artist.getAlbums()){
-                writer.println("ALBUM|" + album.getName());
-
-                for (Song song : album.getSongs()){
-                    writer.println("SONG|" + song.getTitle() + "|" + song.getDuration());
+                    for (Song song : album.getSongs()){
+                        writer.println("SONG|" + song.getTitle() + "|" + song.getDuration());
+                    }
                 }
-            }
-        }	
-        writer.close();
+            }	        	
+        }
     }
 
     /**
      * Opens a library from a file using JFileChooser
-     * @param library
      * @param file
      * @throws IOException
      */

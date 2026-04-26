@@ -1,6 +1,7 @@
 package mediaManager;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 /**
@@ -54,15 +55,20 @@ public class Library {
      * @return
      */
     public List<Object> search(String query) {
-        List<Object> results = new ArrayList<>();
+        if (query == null || query.isBlank()) {
+            return new ArrayList<>();
+        }
+
         String q = query.toLowerCase();
+        // the linked hashset prevents duplicates from artists and albums
+        LinkedHashSet<Object> results = new LinkedHashSet<>();
 
         for (Artist artist : artists) {
+        	List<Album> albums = artist.getAlbums();
 
             // match artist > returns albums
             if (artist.getName().toLowerCase().contains(q)) {
                 results.addAll(artist.getAlbums());
-                continue;
             }
 
             for (Album album : artist.getAlbums()) {
@@ -70,7 +76,6 @@ public class Library {
                 // match album > return a album
                 if (album.getName().toLowerCase().contains(q)) {
                     results.add(album);
-                    continue;
                 }
                 
                 // match song > return a song
@@ -82,7 +87,7 @@ public class Library {
             }
         }
 
-        return results;
+        return new ArrayList<>(results);
     }
 
     /**
