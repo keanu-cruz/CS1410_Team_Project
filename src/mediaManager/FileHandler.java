@@ -9,81 +9,86 @@ import java.util.Scanner;
 
 /**
  * FileHandler reads and writes Library data from a .txt file.
+ * 
  * @author Team Assignment: Keanu Cruz + Logan Chess
  */
 public class FileHandler {
 
-    /**
-     * Saves a library to a file using JFileChooser
-     * @param library
-     * @param file
-     * @throws IOException
-     */
-    public static void save(Library library, File file) throws IOException {
+	/**
+	 * Saves a library to a file using JFileChooser
+	 * 
+	 * @param library
+	 * @param file
+	 * @throws IOException
+	 */
+	public static void save(Library library, File file) throws IOException {
 
-        if(!file.getName().endsWith(".txt")){
-            file = new File(file.getAbsolutePath() + ".txt");
-        }
+		if (!file.getName().endsWith(".txt")) {
+			file = new File(file.getAbsolutePath() + ".txt");
+		}
 
-        try (PrintWriter writer = new PrintWriter(new FileWriter(file, StandardCharsets.UTF_8))) {
-            for (Artist artist : library.getArtists()){
-                writer.println("ARTIST|" + artist.getName());
+		try (PrintWriter writer = new PrintWriter(new FileWriter(file, StandardCharsets.UTF_8))) {
+			for (Artist artist : library.getArtists()) {
+				writer.println("ARTIST|" + artist.getName());
 
-                for (Album album : artist.getAlbums()){
-                    writer.println("ALBUM|" + album.getName());
+				for (Album album : artist.getAlbums()) {
+					writer.println("ALBUM|" + album.getName());
 
-                    for (Song song : album.getSongs()){
-                        writer.println("SONG|" + song.getTitle() + "|" + song.getDuration());
-                    }
-                }
-            }	        	
-        }
-    }
+					for (Song song : album.getSongs()) {
+						writer.println("SONG|" + song.getTitle() + "|" + song.getDuration());
+					}
+				}
+			}
+		}
+	}
 
-    /**
-     * Opens a library from a file using JFileChooser
-     * @param file
-     * @throws IOException
-     */
-    public static Library load(File file) throws IOException{
+	/**
+	 * Opens a library from a file using JFileChooser
+	 * 
+	 * @param file
+	 * @throws IOException
+	 */
+	public static Library load(File file) throws IOException {
 
-        Library library = new Library();
+		Library library = new Library();
 
-        Scanner scanner = new Scanner(file);
+		Scanner scanner = new Scanner(file);
 
-        Artist currentArtist = null;
-        Album currentAlbum = null;
+		Artist currentArtist = null;
+		Album currentAlbum = null;
 
-        while (scanner.hasNextLine()){
-            String line = scanner.nextLine();
+		while (scanner.hasNextLine()) {
+			String line = scanner.nextLine();
 
-            String[] parts = line.split("\\|");
+			String[] parts = line.split("\\|");
 
-            switch (parts[0]){
+			switch (parts[0]) {
 
-                case "ARTIST":
-                    currentArtist = new Artist((parts[1]));
-                    library.addArtist(currentArtist);
-                    break;
+			case "ARTIST":
+				currentArtist = new Artist((parts[1]));
+				library.addArtist(currentArtist);
+				break;
 
-                case "ALBUM":
-                    if (currentArtist == null) continue;
+			case "ALBUM":
+				if (currentArtist == null)
+					continue;
 
-                    currentAlbum = new Album(parts[1]);
-                    currentArtist.addAlbum(currentAlbum);
-                    break;
+				currentAlbum = new Album(parts[1]);
+				currentArtist.addAlbum(currentAlbum);
+				break;
 
-                case "SONG":
-                    if (currentAlbum == null) continue;
+			case "SONG":
+				if (currentAlbum == null)
+					continue;
 
-                    String title = parts[1];
-                    double duration = Double.parseDouble(parts[2]);
+				String title = parts[1];
+				double duration = Double.parseDouble(parts[2]);
 
-                    currentAlbum.addSong(new Song(title, duration));
-                    break;
-            }
-        }
-        scanner.close();
-        return library;
-    }
+				currentAlbum.addSong(new Song(title, duration));
+				break;
+			}
+		}
+		scanner.close();
+		return library;
+	}
 }

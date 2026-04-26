@@ -2,94 +2,86 @@ package mediaManager;
 
 /**
  * A song is a singular musical composition that has been recorded.
+ * 
  * @author Team Assignment: Keanu Cruz + Logan Chess
  */
 public class Song {
-    private String title;
-    private double duration;
-    private String artistName;
-    private String albumName;
+	private String title;
+	private double duration;
 
-    /**
-     * Initializes the fields title and duration for a song.
-     *
-     * @param title
-     * @param duration
-     */
-    public Song(String title, double duration) {
-        if (title == null || title.trim().isEmpty()) {
-            throw new IllegalArgumentException("Song title cannot be empty");
-        }
+	/**
+	 * Initializes the fields title and duration for a song.
+	 *
+	 * @param title
+	 * @param duration
+	 */
+	public Song(String title, double duration) {
+		if (title == null || title.trim().isEmpty()) {
+			throw new IllegalArgumentException("Song title cannot be empty");
+		}
 
-        if (duration <= 0) {
-            throw new IllegalArgumentException("Duration must be positive");
-        }
+		if (duration <= 0) {
+			throw new IllegalArgumentException("Duration must be positive");
+		}
 
-        this.title = Library.inputFormatter(title);
-        this.duration = duration;
-    }
+		this.title = Library.inputFormatter(title);
+		this.duration = duration;
+	}
 
-    /**
-     * Returns title of a song.
-     *
-     * @return
-     */
-    public String getTitle() {
-        return title;
-    }
+	/**
+	 * Returns title of a song.
+	 *
+	 * @return
+	 */
+	public String getTitle() {
+		return title;
+	}
 
-    /**
-     * Returns duration of a song.
-     *
-     * @return duration
-     */
-    public double getDuration() {
-        return duration;
-    }
-    
-    /**
-     * Returns song duration minutes counter.
-     * @return minutes
-     */
-    public int getMinutes() {
-        return (int) duration;
-    }
+	/**
+	 * Returns duration of a song.
+	 *
+	 * @return duration
+	 */
+	public double getDuration() {
+		return duration;
+	}
 
-    /**
-     * Returns song duration seconds counter.
-     * @return seconds
-     */
-    public int getSeconds() {
-        return (int) Math.round((duration - getMinutes()) * 100);
-    }
-    
-    /**
-     * Pulls Artist name and Album name into song for MainGUI Formatting.
-     */
-    public void libraryContext(String artist, String album) {
-    	this.artistName = artist;
-    	this.albumName = album;
-    }
+	/**
+	 * Returns song duration minutes counter.
+	 * 
+	 * @return minutes
+	 */
+	public int getMinutes() {
+		return (int) duration;
+	}
 
-    /**
-     * Returns a String with title truncated if bigger than 28 and duration of song.
-     *
-     * @return
-     */
-    @Override
-    public String toString() {
-        int minutes = (int) duration;
-        int seconds = (int) Math.round((duration - minutes) * 100);
-        
-        int TITLE_WIDTH = 28; // Max Title Width allowed
+	/**
+	 * Returns song duration seconds counter.
+	 * 
+	 * @return seconds
+	 */
+	public int getSeconds() {
+		return (int) Math.round((duration - getMinutes()) * 100);
+	}
 
-        String displayTitle = title;
+	/**
+	 * Returns a String with title truncated if bigger than 28 and duration of song.
+	 *
+	 * @return
+	 */
+	@Override
+	public String toString() {
+		int minutes = (int) duration;
+		int seconds = (int) Math.round((duration - minutes) * 100);
 
-        if (displayTitle.length() > TITLE_WIDTH) {
-            displayTitle = displayTitle.substring(0, TITLE_WIDTH - 3) + "...";
-        }
+		int TITLE_WIDTH = 28; // Max Title Width allowed
 
-        return String.format("%-" + TITLE_WIDTH + "s %5d:%02d",
-                displayTitle, minutes, seconds);
-    }
+		String displayTitle = title;
+
+		if (displayTitle.length() > TITLE_WIDTH) {
+			displayTitle = displayTitle.substring(0, TITLE_WIDTH - 3) + "...";
+		}
+
+		return String.format("%-" + TITLE_WIDTH + "s %5d:%02d", displayTitle, minutes, seconds);
+	}
 }
