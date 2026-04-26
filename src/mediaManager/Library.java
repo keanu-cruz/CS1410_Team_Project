@@ -44,30 +44,45 @@ public class Library {
     }
 
     /**
-     * Returns a song if query is found anywhere in a library.
+     * Returns query search results entered by User in Media Collection Library.
+     * <ul>
+     * 		<li>If searching Artist search returns Albums</li>
+     * 		<li>If searching Album search returns Albums</li>
+     * 		<li>If searching songs search returns Songs</li>
+     * </ul>
      * @param query
      * @return
      */
-    public List<Song> searchSongs(String query){
-        List<Song> results = new ArrayList<>();
+    public List<Object> search(String query) {
+        List<Object> results = new ArrayList<>();
+        String q = query.toLowerCase();
 
-        query = query.toLowerCase();
+        for (Artist artist : artists) {
 
-        for (Artist artist: artists){
-            for (Album album : artist.getAlbums()){
-                for (Song song : album.getSongs()){
+            // match artist > returns albums
+            if (artist.getName().toLowerCase().contains(q)) {
+                results.addAll(artist.getAlbums());
+                continue;
+            }
 
-                    if (artist.getName().toLowerCase().contains(query) ||
-                    album.getName().toLowerCase().contains(query) ||
-                    song.getTitle().toLowerCase().contains(query)){
+            for (Album album : artist.getAlbums()) {
 
+                // match album > return a album
+                if (album.getName().toLowerCase().contains(q)) {
+                    results.add(album);
+                    continue;
+                }
+                
+                // match song > return a song
+                for (Song song : album.getSongs()) {
+                    if (song.getTitle().toLowerCase().contains(q)) {
                         results.add(song);
                     }
                 }
             }
         }
 
-        return new ArrayList<>(results);
+        return results;
     }
 
     /**
