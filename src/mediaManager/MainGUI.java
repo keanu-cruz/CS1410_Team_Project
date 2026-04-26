@@ -882,6 +882,7 @@ public class MainGUI extends JFrame {
 			addContentButton.setEnabled(true);
 			addContentButton.setToolTipText("Add song to this album");
 			backButton.setEnabled(true);
+			removeContentButton.setEnabled(true);
 		} else if (selectedArtist != null) {
 			contentHeader.setText(selectedArtist.getName() + " > Albums");
 
@@ -896,6 +897,7 @@ public class MainGUI extends JFrame {
 			addContentButton.setEnabled(true);
 			addContentButton.setToolTipText("Add album to this artist");
 			backButton.setEnabled(true);
+			removeContentButton.setEnabled(true);
 		} else {
 			contentHeader.setText("Library");
 			for (Artist artist : library.getArtists()) {
@@ -913,6 +915,8 @@ public class MainGUI extends JFrame {
 			addContentButton.setEnabled(false);
 			addContentButton.setToolTipText(null);
 			backButton.setEnabled(false);
+			removeContentButton.setEnabled(false);
+
 		}
 
 		if (selectedAlbum != null) {
